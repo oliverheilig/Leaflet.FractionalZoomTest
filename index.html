@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
+<html>
+<head>
+    <title>Leaflet NonTiledLayer Example</title>
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+	<link rel="stylesheet" href="./L.Control.Zoomslider.css" />
+    <!--[if lt IE 9]>
+		<link rel="stylesheet" href="lib/Leaflet.zoomslider/src/L.Control.Zoomslider.ie.css" />
+	<![endif]-->
+    <link href="./leaflet.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        html,
+        body,
+        #map {
+            height: 100%;
+        }
+		#range {
+    top: 10px;
+    left: 0px;
+    right: 0px;
+    width: 100%;
+    position: absolute;
+}
+    </style>
+</head>
+
+<body>
+    <div id="map" />
+	<div style="position: absolute; left: 50px; top: 10px; z-index: 500">
+		<!-- <button id="london">London</button>
+		<button id="kyiv">Kyiv</button> -->
+		<button id="karlsruhe">karlsruhe</button>
+		<button id="berlin">berlin</button>
+		<button id="london">london</button>
+		<button id="stop">stop</button>
+	</div>
+	<script src="./leaflet.js"></script>
+    <script src="./L.Control.Zoomslider.js"></script>
+    <script src="./NonTiledLayer.js"></script>
+    <script src="./NonTiledLayer.WMS.js"></script>
+    <script src="./token.js"></script>
+    <script>	
+		var karlsruhe = [49.01, 8.4],
+			berlin = [52.52, 13.42],
+			london = [51.51, -0.12];
+			
+		var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
+		var cluster = 'eu-n-test';
+		
+		document.getElementById('karlsruhe').onclick = function () { map.flyTo(karlsruhe, 10); };
+		document.getElementById('berlin').onclick = function () { map.flyTo(berlin, 10); };
+		document.getElementById('london').onclick = function () { map.flyTo(london, 10); };
+		document.getElementById('stop').onclick = function () { map.stop(); };
+		
+		    // returns a layer group for xmap back- and foreground layers
+		function getXMapBaseLayers(cluster, style, token, attribution) {
+			var background = L.tileLayer('https://ajaxbg{s}-' + cluster + '.cloud.ptvgroup.com' + 
+                             '/WMS/GetTile/' + (style ? 'xmap-ajaxbg-' + style : 'xmap-ajaxbg') + '/{x}/{y}/{z}.gif', {
+			attribution: attribution,
+			subdomains: '1234'
+		});
+
+			var foreground = new L.NonTiledLayer.WMS('https://ajaxfg-' + cluster + '.cloud.ptvgroup.com/WMS/WMS' + '?xtok=' + token, {
+				minZoom: 0, opacity: 1.0,
+				layers: style ? 'xmap-ajaxfg-' + style : 'xmap-ajaxfg',
+				format: 'image/png', transparent: true,
+				attribution: attribution
+			});
+
+			return L.layerGroup([background, foreground]);
+		}  
+		
+		// initialize leaflet
+        var map = new L.Map('map');
+
+        // add the xServer layers
+        // set the layer groups for default and sandbox
+        var baseLayers = {
+            "PTV classic": getXMapBaseLayers(cluster, "", token, attribution),
+            "PTV sandbox": getXMapBaseLayers(cluster, "sandbox", token, attribution).addTo(map),
+            "PTV silkysand": getXMapBaseLayers(cluster, "silkysand", token, attribution)
+        };
+		
+		// add basemap selector
+		L.control.layers(baseLayers, null).addTo(map);
+
+        // add scale control
+        L.control.scale().addTo(map);
+
+        // center Karlsruhe
+        map.setView(new L.LatLng(karlsruhe[0], karlsruhe[1]), 10);
+		
+        if (!token)
+            alert("you need to configure your xServer internet token in token.js!")
+    </script>
+</body>
+</html>
