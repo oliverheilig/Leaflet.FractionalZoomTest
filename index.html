@@ -41,7 +41,7 @@
 		<button id="london">london</button>
 		<button id="stop">stop</button>
 	</div>
-	<script src="./leaflet.js"></script>
+	<script src="./leaflet-src.js"></script>
     <script src="./L.Control.Zoomslider.js"></script>
     <script src="./NonTiledLayer.js"></script>
     <script src="./NonTiledLayer.WMS.js"></script>
@@ -78,7 +78,7 @@
 		}  
 		
 		// initialize leaflet
-        var map = new L.Map('map');
+        var map = new L.Map('map', {step: 0.1});
 
         // add the xServer layers
         // set the layer groups for default and sandbox
