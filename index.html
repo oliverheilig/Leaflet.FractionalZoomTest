@@ -62,14 +62,14 @@
 		    // returns a layer group for xmap back- and foreground layers
 		function getXMapBaseLayers(cluster, style, token, attribution) {
 			var background = L.tileLayer('https://ajaxbg{s}-' + cluster + '.cloud.ptvgroup.com' + 
-                             '/WMS/GetTile/' + (style ? 'xmap-ajaxbg-' + style : 'xmap-ajaxbg') + '/{x}/{y}/{z}.gif', {
+                             '/WMS/GetTile/' + (style ? 'xmap-' + style + '-bg' : 'xmap-ajaxbg') + '/{x}/{y}/{z}.png', {
 			attribution: attribution,
 			subdomains: '1234'
 		});
 
 			var foreground = new L.NonTiledLayer.WMS('https://ajaxfg-' + cluster + '.cloud.ptvgroup.com/WMS/WMS' + '?xtok=' + token, {
 				minZoom: 0, opacity: 1.0,
-				layers: style ? 'xmap-ajaxfg-' + style : 'xmap-ajaxfg',
+				layers: style ? 'xmap-' + style + '-fg' : 'xmap-ajaxfg',
 				format: 'image/png', transparent: true,
 				attribution: attribution
 			});
