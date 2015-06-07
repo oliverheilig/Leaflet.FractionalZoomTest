@@ -10,14 +10,14 @@ L.NonTiledLayer = L.Layer.extend({
         zIndex: undefined,
         minZoom: -99
     },
-	url: '',
+    url: '',
 
     // override this method in the inherited class
     //getImageUrl: function (world1, world2, width, height) {},
     //getImageUrlAsync: function (world1, world2, width, height, f) {},
 
     initialize: function (options) {
-        L.setOptions(this, options);		
+        L.setOptions(this, options);
     },
 
     onAdd: function (map) {
@@ -31,36 +31,41 @@ L.NonTiledLayer = L.Layer.extend({
         else
             this._pane = this._map.getPanes().overlayPane;
 
-        if (map.options.zoomAnimation && L.Browser.any3d) {
-            map.on('zoomanim', this._animateZoom, this);
-        }
-
-        this._map.on('moveend', this._update, this);
-
         this._pane.appendChild(this._div);
-		
-		this._bufferImage = this._initImage();
-		this._currentImage = this._initImage();
+
+        this._bufferImage = this._initImage();
+        this._currentImage = this._initImage();
 
         this._update();
     },
 
     onRemove: function (map) {
         this._pane.removeChild(this._div);
-		
-		this._div.removeChild(this._bufferImage);
-        this._div.removeChild(this._currentImage);  
 
-        this._map.off('moveend', this._update, this);
-
-        if (map.options.zoomAnimation) {
-            map.off('zoomanim', this._animateZoom, this);
-        }
+        this._div.removeChild(this._bufferImage);
+        this._div.removeChild(this._currentImage);
     },
 
     addTo: function (map) {
         map.addLayer(this);
         return this;
+    },
+
+    getEvents: function () {
+        var events = {
+            moveend: this._update,
+            zoom: this._viewreset
+        };
+
+        if (this._zoomAnimated) {
+            events.zoomanim = this._animateZoom;
+        }
+
+        return events;
+    },
+
+    getElement: function () {
+        return this._div;
     },
 
     setOpacity: function (opacity) {
@@ -96,9 +101,9 @@ L.NonTiledLayer = L.Layer.extend({
 
 
     _initImage: function (_image) {
-	    var _image = L.DomUtil.create('img', 'leaflet-image-layer');
+        var _image = L.DomUtil.create('img', 'leaflet-image-layer');
 
-        if(this.options.zIndex !== undefined )
+        if (this.options.zIndex !== undefined)
             _image.style.zIndex = this.options.zIndex;
         this._div.appendChild(_image);
 
@@ -139,13 +144,9 @@ L.NonTiledLayer = L.Layer.extend({
         var map = this._map,
 		    scale = map.getZoomScale(e.zoom),
 		    nw = image._bounds.getNorthWest(),
-		    se = image._bounds.getSouthEast(),
+		    offset = map._latLngToNewLayerPoint(nw, e.zoom, e.center);
 
-		    topLeft = map._latLngToNewLayerPoint(nw, e.zoom, e.center),
-		    size = map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft),
-		    origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)));
-			
-			L.DomUtil.setTransform(image, origin, scale);
+        L.DomUtil.setTransform(image, offset, scale);
     },
 
     _resetImage: function (image) {
@@ -179,17 +180,24 @@ L.NonTiledLayer = L.Layer.extend({
         return new L.LatLngBounds(world1, world2);
     },
 
-    _update: function () {
+    _viewreset: function () {
         if (this._map.getZoom() < this.options.minZoom) {
-            this._div.style.visibility='hidden';
+            this._div.style.visibility = 'hidden';
             return;
         }
         else {
             this._div.style.visibility = 'visible';
         }
-		
-		if(this._bufferImage._bounds)
-			this._resetImage(this._bufferImage);
+
+        if (this._bufferImage._bounds)
+            this._resetImage(this._bufferImage);
+    },
+
+    ixxx: 0,
+    _update: function () {
+        console.log(this.ixxx++);
+
+        this._viewreset();
 
         var bounds = this._getClippedBounds();
 
@@ -218,25 +226,25 @@ L.NonTiledLayer = L.Layer.extend({
                 i.tag = tag;
             });
 
-		this.url = i.src;
-			
+        this.url = i.src;
+
         L.DomUtil.setOpacity(this._currentImage, 0);
     },
 
     _onImageLoad: function (e) {
-	  if (e.target.src != this.url) { // obsolete image
+        if (e.target.src != this.url) { // obsolete image
             return;
         }
-		
+
         if (this._addInteraction)
             this._addInteraction(this._currentImage.tag)
 
         L.DomUtil.setOpacity(this._currentImage, this.options.opacity);
         L.DomUtil.setOpacity(this._bufferImage, 0);
 
-		var tmp = this._bufferImage;
+        var tmp = this._bufferImage;
         this._bufferImage = this._currentImage;
-		this._currentImage = tmp;
+        this._currentImage = tmp;
 
         this.fire('load');
     },

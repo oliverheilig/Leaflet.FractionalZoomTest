@@ -39,7 +39,7 @@
 		<button id="karlsruhe">karlsruhe</button>
 		<button id="berlin">berlin</button>
 		<button id="london">london</button>
-		<button id="stop">stop</button>
+		<!-- <button id="stop">stop</button> -->
 	</div>
 	<script src="./leaflet-src.js"></script>
     <script src="./L.Control.Zoomslider.js"></script>
@@ -54,12 +54,12 @@
 		var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 		var cluster = 'eu-n-test';
 		
-		document.getElementById('karlsruhe').onclick = function () { map.flyTo(karlsruhe, 10); };
+		document.getElementById('karlsruhe').onclick = function () { map.flyTo(karlsruhe, 13); };
 		document.getElementById('berlin').onclick = function () { map.flyTo(berlin, 10); };
 		document.getElementById('london').onclick = function () { map.flyTo(london, 10); };
-		document.getElementById('stop').onclick = function () { map.stop(); };
+		// document.getElementById('stop').onclick = function () { map.stop(); };
 		
-		    // returns a layer group for xmap back- and foreground layers
+		// returns a layer group for xmap back- and foreground layers
 		function getXMapBaseLayers(cluster, style, token, attribution) {
 			var background = L.tileLayer('https://ajaxbg{s}-' + cluster + '.cloud.ptvgroup.com' + 
                              '/WMS/GetTile/' + (style ? 'xmap-' + style + '-bg' : 'xmap-ajaxbg') + '/{x}/{y}/{z}.png', {
@@ -95,7 +95,7 @@
         L.control.scale().addTo(map);
 
         // center Karlsruhe
-        map.setView(new L.LatLng(karlsruhe[0], karlsruhe[1]), 10);
+        map.setView(new L.LatLng(karlsruhe[0], karlsruhe[1]), 13);
 		
         if (!token)
             alert("you need to configure your xServer internet token in token.js!")
