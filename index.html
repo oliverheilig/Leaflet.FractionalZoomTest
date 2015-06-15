@@ -84,8 +84,9 @@
         // set the layer groups for default and sandbox
         var baseLayers = {
             "PTV classic": getXMapBaseLayers(cluster, "", token, attribution),
-            "PTV sandbox": getXMapBaseLayers(cluster, "sandbox", token, attribution).addTo(map),
-            "PTV silkysand": getXMapBaseLayers(cluster, "silkysand", token, attribution)
+            "PTV sandbox": getXMapBaseLayers(cluster, "sandbox", token, attribution),
+            "PTV silkysand": getXMapBaseLayers(cluster, "silkysand", token, attribution),
+            "PTV gravelpit": getXMapBaseLayers(cluster, "gravelpit", token, attribution).addTo(map)
         };
 		
 		// add basemap selector
