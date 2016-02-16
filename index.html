@@ -78,7 +78,11 @@
 		}  
 		
 		// initialize leaflet
-        var map = new L.Map('map', {step: 0.1});
+        var map = new L.Map('map', {          
+			zoomSnap: 0,
+            zoomDelta: 0.25,
+			wheelPxPerZoomLevel: 100
+        });
 
         // add the xServer layers
         // set the layer groups for default and sandbox
